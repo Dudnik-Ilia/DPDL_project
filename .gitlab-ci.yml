@@ -1,0 +1,29 @@
+---
+
+image:
+  name: "pandoc/latex"
+  entrypoint: ["/bin/sh", "-c"]
+
+stages:
+  - build
+
+before_script:
+  - apk update
+  - apk add make
+
+# cache:
+#   paths:
+#     - ./venv/
+#   key: "$CI_PROJECT_PATH"
+
+
+
+build:
+  stage: build
+  script:
+    - make -j
+  artifacts:
+    paths:
+      - './*.pdf'
+
+...
