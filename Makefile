@@ -6,7 +6,7 @@ PDF = $(MD:%.md=%.pdf)
 all: $(PDF)
 
 %.pdf: %.md
-	pandoc -o $@ $<
+	pandoc --pdf-engine=xelatex -o $@ $<
 
 $(PDF): $(MD)
 
