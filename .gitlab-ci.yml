@@ -24,6 +24,7 @@ build:
     - make -j
   artifacts:
     paths:
-      - './*.pdf'
+      - instructions.pdf
+    expire_in: 4 weeks  
 
 ...
