@@ -1,5 +1,4 @@
 # Usage of the RRZE HPC Cluster
-
 ## Introduction
 
 On a cluster you don't normally work directly with the computers performing your computations (the *compute nodes*). Instead, you connect to a special node (the *submit node*), submit your job there, and the cluster software will schedule it for execution on one of the compute nodes. As soon as the scheduler has found a node with the resources required for your job (and you haven't exceeded the maximum number of active jobs allowed for your account), the job is executed there.
@@ -30,11 +29,11 @@ Open up
 ssh username@cshpc.rrze.fau.de
 ```
 
-From there we can accesss the cluster frontend `woody.rrze.fau.de` (Starting from 09/18 the login node will be `tinyx.nhr.fau.de`)
+From there we can accesss the cluster frontend `tinyx.nhr.fau.de` 
 
 
 ```bash
-ssh woody.rrze.fau.de
+ssh tinyx.nhr.fau.de
 ```
 
 **Note:** When you connect for the first time you have to confirm with yes that you trust the remote computer. 
@@ -74,7 +73,7 @@ scp -r -p username@cshpc.rrze.fau.de:~/foo/ ~/Downloads/
 1. Open WinSCP (https://winscp.net/)
 2. Select New Session
 3. Select *SCP* as file protocol from the dropdown menu
-4. The hostname is either `woody.rrze.fau.de` (inside FAU, before 09/18) or `tinyx.nhr.fau.de`(after 09/18) or `cshpc.rrze.fau.de` (outside from FAU)
+4. The hostname is `tinyx.nhr.fau.de`(inside FAU) or `cshpc.rrze.fau.de` (outside from FAU)
 5. Provide your (HPC) username and password
 6. Press Login
 
@@ -94,7 +93,7 @@ By copying files from the right pane to the left pane you can also download data
 
 ## Setup Conda on the cluster
 
-1. Connect via ssh to `woody.rrze.fau.de` as described previously.
+1. Connect via ssh to `tinyx.nhr.fau.de` as described previously.
 2. Anaconda is already installed in the form of a module. To load anaconda type:
 
 ```bash
@@ -194,7 +193,7 @@ After submission, sbatch will output the **Job ID** of your job. It can later be
 Below is an example for a job script which handles everything needed to train a neural network:
 
 ```bash
-#!/bin/bash 
+#!/bin/bash -l
 #SBATCH --job-name=IIML_Tut
 #SBATCH --ntasks=1
 #SBATCH --gres=gpu:1
@@ -264,6 +263,15 @@ from the directory where you have the code.
 | `scancel.tinygpu <JobID>`           | Removes job from queue or terminates it if it’s already running. |
 | `scontrol.tinygpu show job <JobID>` | Displays very detailed information on jobs.                  |
 
+To avoid to type this commands every time you can define an alias by adding the following lines to  your `.bashrc` 
+
+```bash
+alias sq="squeue.tinygpu"
+alias sb="sbatch.tinygpu"
+```
+
+
+
 #### Debugging with an interactive slurm shell
 
 You can request an interactive shell, too. This is especially useful if you want to debug your code or check if everything works before submitting a hour-long training job. 
@@ -288,10 +296,10 @@ Tensorboard visualizes the progress of your training (e.g. the loss curve, accur
 
 <img src="img/tebo.png" alt="tebo" style="zoom:33%;" />
 
-You can either copy the logs to your local machine and run tensorboard from there or you can run tensorboard from the cluster frontend (`woody.rrze.fau.de`). 
+You can either copy the logs to your local machine and run tensorboard from there or you can run tensorboard from the cluster frontend (`tinyx.nhr.fau.de`). 
 
 1. Connect via VPN to the university network
-2. `ssh` to `woody.rrze.fau.de`
+2. `ssh` to `tinyx.nhr.fau.de`
 3. run `tensorboard --logdir=/path/to/your/logs --bind_all`
 4. Tensorboard will give you the URL to the tensorboard. Typically http://woody3.rrze.uni-erlangen.de:6006/ (Press CTRL+C to quit)
 5. Open the URL in your browser
@@ -315,7 +323,7 @@ In the repository you'll find a small training script as an example. The followi
 1. `ssh` to the cluster frontend 
 
 ```bash
-ssh username@woody.rrze.fau.de
+ssh username@tinyx.nhr.fau.de
 ```
 
 2. Clone the git repository with the example code
@@ -328,7 +336,7 @@ git clone https://gitlab.cs.fau.de/aimi-lab/3-teaching/wise2021_iiml_mura.git
 4. Open up a second Terminal-Window and use `scp` to transfer the downloaded dataset to the cluster
 
 ```bash
-scp -r ~/Downloads/data.zip username@woody.rrze.fau.de:~/repos/wise2021_iiml_mura/cluster/
+scp -r ~/Downloads/data.zip username@tinyx.nhr.fau.de:~/repos/wise2021_iiml_mura/cluster/
 ```
 
 5. Go to the directory of the example:
@@ -374,8 +382,8 @@ Host cshpc
   User iwso041h 
   IdentityFile ~/.ssh/clusterdialog 
 
-Host woody
-  HostName woody.rrze.fau.de
+Host tinyx
+  HostName tinyx.nhr.fau.de
   ProxyCommand ssh -q -W %h:%p cshpc
   User iwso041h 
   IdentityFile ~/.ssh/cresty
@@ -407,7 +415,6 @@ If you are not familiar with the Linux shell help yourself with a (non-exhaustiv
 | `grep pattern file`          | Search for a pattern in a file or stdin. Example `grep "Epoch: 4" log.txt` |
 | `nano filename`              | Light-weight text-editor. Useful for config files etc.       |
 | `quota -s`                   | See quota for storage in human-readable format       |
-
 
 
 
