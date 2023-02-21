@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash -l
 #SBATCH --job-name=IIML_Tut
 #SBATCH --ntasks=1
 #SBATCH --gres=gpu:1
