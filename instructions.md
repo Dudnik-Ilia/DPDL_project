@@ -11,6 +11,7 @@ To access the cluster a special account is required. The username for this accou
 
 <img src="img/idm_accounts.png" alt="idm_accounts" style="zoom:33%;" />
 
+Before you can start working on the cluster you need to set a password. Note that this may take up to **3 hours** to become active.
 To set up a password for your account click the gear and select "Change Password"
 
 ![idm_password](img/idm_password.png)
@@ -26,7 +27,7 @@ If you are using Linux, macOS or Windows 10 (build 1809 and newer) `ssh` comes p
 Open up 
 
 ```bash
-ssh username@cshpc.rrze.fau.de
+ssh your_cluster_username@cshpc.rrze.fau.de
 ```
 
 From there we can accesss the cluster frontend `tinyx.nhr.fau.de` 
@@ -46,7 +47,10 @@ Download and open PuTTY and select `ssh` as connection type.
 
 ## Transfer Data to the Cluster
 
-Code files are best transfered using git - you can clone your repository on the cluster. Large binaries, which should not be checked into git (i.e. the dataset) can be transfered via `scp`. On Unix-like operating systems like Linux or macOS `scp` comes preinstalled. On Windows you can use WinSCP (https://winscp.net/).
+Code files are best transfered using git - you can clone your repository on the cluster.
+
+For this project, we will make the data available on the cluster for you to access there. 
+Still, if you have a reason to transfer additional large files, read on: Large binaries, which should not be checked into git (i.e. the dataset) can be transfered via `scp`. On Unix-like operating systems like Linux or macOS `scp` comes preinstalled. On Windows you can use WinSCP (https://winscp.net/).
 
 #### Linux / macOS: 
 
@@ -161,13 +165,13 @@ conda info
    You can either create an emtpy environment using the command below:
 
 ```bash
-conda create --name=seminar python=3.9
+conda create --name=seminar_dpdl python=3.9
 ```
 
-​	Or you can use the `.yml`-file provided in the git repository to install the required packages automatically:
+​	Or you can use the `.yml`-file **that will soon be provided** in the git repository to install the required packages automatically:
 
 ```bash
-conda env create --file seminar.yml
+conda env create --file seminar_dpdl.yml
 ```
 
 ​	If you decide **not to use** the `.yml` file use this command to install pytorch:
@@ -274,7 +278,7 @@ alias sb="sbatch.tinygpu"
 
 #### Debugging with an interactive slurm shell
 
-You can request an interactive shell, too. This is especially useful if you want to debug your code or check if everything works before submitting a hour-long training job. 
+You can request an interactive shell, too. This is especially useful if you want to debug your code or check if everything works before submitting a hour-long training job. Please do not use the interactive shell for ongoing development.
 
 To generate an interactive Slurm shell on one of the compute nodes, the following command has to be issued on the woody frontend:
 
@@ -329,7 +333,7 @@ ssh username@tinyx.nhr.fau.de
 2. Clone the git repository with the example code
 
 ```bash
-git clone https://gitlab.cs.fau.de/aimi-lab/3-teaching/wise2021_iiml_mura.git
+git clone https://gitlab.cs.fau.de/aimi-lab-fau/cluster-instructions-dpdl
 ```
 
 3. Download the dataset from Google Drive: https://drive.google.com/drive/folders/1GXhjcsnwC5JxmWGkjCsY8Tifz3m8shIx?usp=sharing to your local machine (you can also use `curl` )
