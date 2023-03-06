@@ -98,10 +98,12 @@ By copying files from the right pane to the left pane you can also download data
 ## Setup Conda on the cluster
 
 1. Connect via ssh to `tinyx.nhr.fau.de` as described previously.
-2. Anaconda is already installed in the form of a module. To load anaconda type:
+2. Anaconda is already installed in the form of a module. To load anaconda, cuda and cudnn type:
 
 ```bash
 module load python
+module load cudnn
+module load cuda
 ```
 
 3. When you use conda for the first time with your account, run:
@@ -216,9 +218,11 @@ export https_proxy=http://proxy:80
 
 module purge
 module load python
+module load cuda
+module load cudnn
 
 # Conda
-source activate seminar
+source activate seminar_dpdl
 
 # create a temporary job dir on $WORK
 mkdir ${WORK}/$SLURM_JOB_ID
@@ -290,8 +294,10 @@ When your job allocation is granted your connect automatically to the correspond
 
 ```bash
 module load python
+module load cuda
+module load cudnn
 source ~/.bashrc
-source activate seminar # or the name of your conda env
+source activate seminar_dpdl # or the name of your conda env
 ```
 
 ## Tensorboard
