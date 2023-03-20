@@ -141,7 +141,33 @@ fi
 
 ​	Save the file (Ctrl+O) and exit (Ctrl+X). 
 
-6. By default packages are installed to ``~/.conda``. To prevent your home folder from hitting the quota change the default paths by following these steps:
+6. \*\*__NEW__\*\* There are now two options: You can use the predefined seminar_dpdl conda environment that we have prepared on the cluster (recommended) - or you can set-up a new environment from scratch. You can find option 1 and option 2 below.
+
+#### Option 1: Using the environment we have prepared (recommended)
+
+7. By default packages are installed to ``~/.conda``. To add the predefined environment to your list of available options and to prevent   your home folder from hitting the quota change the default paths by following these steps:
+
+```bash
+conda config
+```
+
+```bash
+pkgs_dirs:
+- ${WOODYHOME}/software/privat/conda/pkgs
+envs_dirs:
+- ${WOODYHOME}/software/privat/conda/envs
+- /home/woody/iwb0/iwb0002h/software/privat/conda/envs/seminar_dpdl
+```
+You can then activate the environment with 
+```bash
+conda activate seminar_dpdl
+```
+
+If you use this strategy, this environment should also be available to you via the cluster jupyterhub.
+
+#### Option 1: Setting up the environment from scratch
+
+7. By default packages are installed to ``~/.conda``. To prevent your home folder from hitting the quota change the default paths by following these steps:
 
 ```bash
 conda config
@@ -156,13 +182,13 @@ envs_dirs:
 - ${WOODYHOME}/software/privat/conda/envs
 ```
 
-7. Everything is set up. To check your configuration you can call
+8. Everything is set up. To check your configuration you can call
 
 ```bash
 conda info
 ```
 
-8. Finally, create an environment. 
+9. Finally, create an environment. 
 
    You can either create an emtpy environment using the command below:
 
@@ -170,18 +196,12 @@ conda info
 conda create --name=seminar_dpdl python=3.9
 ```
 
-​	Or you can use the `.yml`-file **that will soon be provided** in the git repository to install the required packages automatically:
+​	Or you can use the `.yml`-file that is provided in the git repository to install the required packages automatically:
 
 ```bash
 conda env create --file seminar_dpdl.yml
 ```
-
-​	If you decide **not to use** the `.yml` file use this command to install pytorch:
-
-```bash
-conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
-```
-
+Note that this can be quite slow, as the cluster is sometimes a bit buggy.
 
 
 ##  Creating and Submitting Jobs
@@ -200,7 +220,7 @@ Below is an example for a job script which handles everything needed to train a 
 
 ```bash
 #!/bin/bash -l
-#SBATCH --job-name=IIML_Tut
+#SBATCH --job-name=<your_job_name>
 #SBATCH --ntasks=1
 #SBATCH --gres=gpu:1
 #SBATCH --output=R-%x.%j.out
@@ -234,7 +254,7 @@ mkdir -p output/logs/
 mkdir -p output/checkpoints/
 
 # Run training script
-srun python src/Training.py 
+srun python training.py # add training parameters
 
 # Create a directory on $HOME and copy the results from our training
 mkdir ${HOME}/$SLURM_JOB_ID
