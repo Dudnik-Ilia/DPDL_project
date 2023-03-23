@@ -141,9 +141,9 @@ fi
 
 ​	Save the file (Ctrl+O) and exit (Ctrl+X). 
 
-6. \*\*__NEW__\*\* There are now two options: You can use the predefined seminar_dpdl conda environment that we have prepared on the cluster (recommended) - or you can set-up a new environment from scratch. You can find option 1 and option 2 below.
+6. \*\*__NEW__\*\* There are now two options: You can use the predefined seminar_dpdlv2 conda environment that we have prepared on the cluster (recommended) - or you can set-up a new environment from scratch. You can find option 1 and option 2 below.
 
-#### Option 1: Using the environment we have prepared (recommended)
+#### Option 1: Use the environment we have prepared (strongly recommended)
 
 7. By default packages are installed to ``~/.conda``. To add the predefined environment to your list of available options and to prevent   your home folder from hitting the quota change the default paths by following these steps:
 
@@ -156,16 +156,16 @@ pkgs_dirs:
 - ${WOODYHOME}/software/privat/conda/pkgs
 envs_dirs:
 - ${WOODYHOME}/software/privat/conda/envs
-- /home/woody/iwb0/iwb0002h/software/privat/conda/envs/seminar_dpdl
+- /home/woody/iwb0/iwb0002h/software/privat/conda/envs
 ```
 You can then activate the environment with 
 ```bash
-conda activate seminar_dpdl
+conda activate seminar_dpdlv2
 ```
 
 If you use this strategy, this environment should also be available to you via the cluster jupyterhub.
 
-#### Option 1: Setting up the environment from scratch
+#### Option 1: Set up the environment from scratch
 
 7. By default packages are installed to ``~/.conda``. To prevent your home folder from hitting the quota change the default paths by following these steps:
 
@@ -193,13 +193,13 @@ conda info
    You can either create an emtpy environment using the command below:
 
 ```bash
-conda create --name=seminar_dpdl python=3.9
+conda create --name=seminar_dpdl python=3.10
 ```
 
 ​	Or you can use the `.yml`-file that is provided in the git repository to install the required packages automatically:
 
 ```bash
-conda env create --file seminar_dpdl.yml
+conda env create --file seminar_dpdlv2.yml
 ```
 Note that this can be quite slow, as the cluster is sometimes a bit buggy.
 
@@ -242,7 +242,7 @@ module load cuda
 module load cudnn
 
 # Conda
-source activate seminar_dpdl
+source activate seminar_dpdlv2
 
 # create a temporary job dir on $WORK
 mkdir ${WORK}/$SLURM_JOB_ID
@@ -317,7 +317,7 @@ module load python
 module load cuda
 module load cudnn
 source ~/.bashrc
-source activate seminar_dpdl # or the name of your conda env
+source activate seminar_dpdlv2 # or the name of your conda env
 ```
 
 ## Tensorboard
