@@ -1,0 +1,19 @@
+name: seminar_dpdlv2
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - torchvision
+  - pytorch
+  - pytorch-cuda=11.8
+  - openslide-python
+  - albumentations
+  - scikit-learn
+  - matplotlib
+  - jupyter
+  - pytorch-lightning
+  - tensorboard
+  - pip
+  - pip:
+      - evalutils
