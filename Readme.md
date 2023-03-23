@@ -165,7 +165,7 @@ conda activate seminar_dpdlv2
 
 If you use this strategy, this environment should also be available to you via the cluster jupyterhub.
 
-#### Option 1: Set up the environment from scratch
+#### Option 2: Set up the environment from scratch (not recommended)
 
 7. By default packages are installed to ``~/.conda``. To prevent your home folder from hitting the quota change the default paths by following these steps:
 
