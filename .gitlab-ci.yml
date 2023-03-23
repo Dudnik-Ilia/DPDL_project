@@ -24,7 +24,7 @@ build:
     - make -j
   artifacts:
     paths:
-      - instructions.pdf
+      - cluster_instructions.pdf
     expire_in: 4 weeks  
 
 ...
