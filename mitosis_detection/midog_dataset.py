@@ -96,7 +96,7 @@ def custom_sampling_fun(targets, dimensions, patch_dims):
     # pick the shift of the patch relative to anchor
     # be sure that annotation is inside:
 
-    if (x_1_ROI-x_0_ROI) < patch_dims[0] or (y_1_ROI-y_0_ROI) < patch_dims[1]:
+    if (x_1_ROI-x_0_ROI) >= patch_dims[0] or (y_1_ROI-y_0_ROI) >= patch_dims[1]:
         raise ValueError("The annotation box is bigger than the patch size!")
 
     # minimum is the half of the annotation box (because with respect to the center(anchor))
