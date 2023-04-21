@@ -108,9 +108,9 @@ def training_val(args):
     # split the train set into train and validation
     train_containers, val_containers = train_test_split(containers, train_size=0.8, random_state=args.seed)
 
-    dataset = MIDOGTrainDataset(train_containers, patches_per_slide=args.npatchtrain, transform=tfms, sample_func=my_sample_func)
+    dataset = MIDOGTrainDataset(train_containers, patches_per_slide_container=args.npatchtrain, transform=tfms, sample_func=my_sample_func)
         
-    val_dataset = MIDOGTrainDataset(val_containers, patches_per_slide=args.npatchval, transform=tfms, sample_func=my_sample_func)
+    val_dataset = MIDOGTrainDataset(val_containers, patches_per_slide_container=args.npatchval, transform=tfms, sample_func=my_sample_func)
     
     # this is not ideal but use num_workers=0 - there seems to be an bug in openslide that causes missed pixels during multi-threading
     data_loader = torch.utils.data.DataLoader(

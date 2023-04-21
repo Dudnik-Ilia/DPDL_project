@@ -27,6 +27,9 @@ class SlideContainer:
         self.level = level
 
     def get_patch(self,  x: int = 0, y: int = 0):
+        """
+        Cuts the image at x,y coords
+        """
         try:
             arr = np.copy(np.array(self.slide.read_region(location=(int(x * self.down_factor), int(y * self.down_factor)),
                                                level=self.level, size=(self.width, self.height)))[:, :, :3])
@@ -50,46 +53,109 @@ class SlideContainer:
         return str(self.file)
 
     def get_new_train_coordinates(self, sample_func=None):
+        """
+        Outputs: x0, y0 of a patch
+        The standard version cuts the picture to the size of the patch
+        on the bottom and right and selects a stupidly random point.
+        """
         # TODO: Implement a sampling method that can be provided via sample_func
-
+        patch_dimensions = (self.width, self.height)
+        # image dims
+        width, height = self.slide.level_dimensions[self.level]
         # use passed sampling method
         if callable(sample_func):
-            return sample_func(self.targets, **{"classes": self.classes, "shape": self.shape,
+            """return sample_func(self.targets, **{"classes": self.classes, "shape": self.shape,
                                                      "level_dimensions": self.slide.level_dimensions,
                                                      "level": self.level})
+            """
+            return sample_func(self.targets,
+                               (width, height),
+                               patch_dimensions)
 
         # use default sampling method
-        width, height = self.slide.level_dimensions[self.level]
-        return np.random.randint(0, width - self.shape[0]), np.random.randint(0, height - self.shape[1])
+        # here is the cut that assures of picking patch that is not beyond size of the image
+        x0,y0 = np.random.randint(0, width - self.shape[0]), np.random.randint(0, height - self.shape[1])
+        return x0,y0
+
+
+def custom_sampling_fun(targets, dimensions, patch_dims):
+    """
+    Inputs:
+        targets: boxes and labels
+        dimensions: width and height of the whole image
+        patch_dims: size of the patch
+    """
+    bboxes, labels = targets
+    width, height = dimensions
+
+    # pick random annotation on the image
+    i = np.random.randint(len(bboxes))
+    x_0_ROI, y_0_ROI, x_1_ROI, y_1_ROI = bboxes[i]
+    # find an anchor (center)
+    anchor_x, anchor_y = (x_1_ROI+x_0_ROI)/2, (y_1_ROI+y_0_ROI)/2
+    # pick the shift of the patch relative to anchor
+    # be sure that annotation is inside:
+
+    if (x_1_ROI-x_0_ROI) < patch_dims[0] or (y_1_ROI-y_0_ROI) < patch_dims[1]:
+        raise ValueError("The annotation box is bigger than the patch size!")
+
+    # minimum is the half of the annotation box (because with respect to the center(anchor))
+    # maximum is the patch size minus half annotation box size
+    anchor_shift_x = np.random.randint((x_1_ROI-x_0_ROI)/2,
+                                       patch_dims[0]-((x_1_ROI-x_0_ROI)/2))
+    anchor_shift_y = np.random.randint((y_1_ROI-y_0_ROI)/2,
+                                       patch_dims[1]-((y_1_ROI-y_0_ROI)/2))
+    x0 = anchor_x - anchor_shift_x
+    y0 = anchor_y - anchor_shift_y
+    # check if we are beyond
+    if x0 < 0:
+        x0 = 0
+    if y0 < 0:
+        y0 = 0
+    if x0+patch_dims[0] >= width:
+        x0 = width - patch_dims[0]
+    if y0+patch_dims[1] >= height:
+        y0 = height - patch_dims[1]
+
+    return x0, y0
 
 
 class MIDOGTrainDataset(Dataset):
 
-    def __init__(self, list_containers: list[SlideContainer], patches_per_slide: int = 10, transform=None, sample_func=None) -> None:
+    def __init__(self, list_containers: list[SlideContainer], patches_per_slide_container: int = 10, transform=None, sample_func=None) -> None:
         super().__init__()
         self.list_containers = list_containers
         # note that we are working with pseudo-epochs. We could also exact a set amount of patches per 
         # image region but sampling them randomly typically adds additional variability to the samples
-        self.patches_per_slide = patches_per_slide
+        self.patches_per_slide_container = patches_per_slide_container
         self.transform = transform
         self.sample_func = sample_func
 
     def __len__(self):
-        return len(self.list_containers)*self.patches_per_slide
+        return len(self.list_containers)*self.patches_per_slide_container
 
     def get_patch_w_labels(self, cur_container: SlideContainer, x: int=0, y: int=0):
+        """
+        inputs: x,y coords of training sample
+        returns patch (tensor) and target (what form?)
+        """
 
+        # cut the image 512 size we set up (256 default)
         patch = cur_container.get_patch(x, y)
     
         bboxes, labels = cur_container.targets
+        # cut size - 512
         h, w = cur_container.shape
 
+        # they are being changed to np but they already are
         bboxes = np.array([box for box in bboxes]) if len(np.array(bboxes).shape) == 1 else np.array(bboxes)
         labels = np.array(labels)
 
         area = np.empty([0])
 
+        # why to check, if it is train and labels are there?
         if len(labels) > 0:
+            # Bboxes adjustment for the cut image
             bboxes, labels = viz_utils.filter_bboxes(bboxes, labels, x, y, w, h)
 
             # not ideal, but ensuring consistency (not cutting bboxes before augmentation) is a massive amount of work with likely fairly little additional benefit
@@ -120,8 +186,10 @@ class MIDOGTrainDataset(Dataset):
         return patch_as_tensor, targets
 
     def __getitem__(self, idx):
+        # select the container we want to sample from
         idx_slide = idx % len(self.list_containers)
         cur_image_container = self.list_containers[idx_slide]
+        # by default just random cut from the image
         train_coordinates = cur_image_container.get_new_train_coordinates(self.sample_func)
 
         return self.get_patch_w_labels(cur_image_container, *train_coordinates)

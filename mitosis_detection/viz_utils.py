@@ -66,17 +66,29 @@ def get_colors_for_labels(labels, dict_colors={1: "yellow", 2: "blue"}):
 
 
 def filter_bboxes(bboxes, labels, x0, y0, w, h):
+    """
+    Input assumption: the ROI is inside cut image
+
+    Adjust bboxes coords so they are relative
+    to the cutted part of the image (x0,y0)
+    """
     # generate copy of boxes
     if len(bboxes) != len(labels):
          raise ValueError("lists bboxes and classes should have the same length but have length {} and {}".format(len(bboxes), len(labels)))
 
+    # assume the cutting part contains the target patch
+    # bboxes[:, [0, 2]] is xmin and xmax of all boxes
     if len(labels) > 0:
         bboxes = np.copy(bboxes)
 
+        # adjust bboxes coords so they are relative
+        # to the cutted part of the image (x0,y0)
         bboxes[:, [0, 2]] = bboxes[:, [0, 2]] - x0
         bboxes[:, [1, 3]] = bboxes[:, [1, 3]] - y0
 
-        bb_half_widths = (bboxes[:, 2] - bboxes[:, 0]) / 2  # if half of the box is still contained in the image -- keep
+        # !!!
+        # if half of the box is still contained in the image -- keep!!!
+        bb_half_widths = (bboxes[:, 2] - bboxes[:, 0]) / 2
         bb_half_heights = (bboxes[:, 3] - bboxes[:, 1]) / 2
         ids = ((bboxes[:, 0] + bb_half_widths) > 0) \
                 & ((bboxes[:, 1] + bb_half_heights) > 0) \
@@ -85,7 +97,11 @@ def filter_bboxes(bboxes, labels, x0, y0, w, h):
 
         bboxes = bboxes[ids]
         labels = labels[ids]
-        bboxes = np.clip(bboxes, 0, max(h, w))  # not an issue for quadratic regions, but wouldn't this be problematic otherwise?
+
+        # not an issue for quadratic regions, but wouldn't this be problematic otherwise?
+        # if the bbox is contained, why to check?
+        # the annotations are always boxes
+        bboxes = np.clip(bboxes, 0, max(h, w))
 
     return bboxes, labels
 
